@@ -54,6 +54,10 @@ To report bugs or request features, please [open an issue](https://github.com/ye
 
 ### 🤔 What you should NOT do
 
+- Submitting low-effort or noise PRs, including, but not limited to: unnecessary README edits, cosmetic documentation tweaks, or changes unrelated to an actual issue or improvement.
+
+  - If a change does not fix a bug, add a feature, or meaningfully improve documentation, it likely does not belong in a pull request.
+
 - Avoid submitting pull requests with **only cosmetic changes** (e.g., whitespace tweaks or code reformatting without functional impact).  
   - These changes clutter diffs and make code reviews harder. [See this comment by the Rails team](https://github.com/rails/rails/pull/13771#issuecomment-32746700).
   - Always run Prettier before committing to avoid unnecessary diffs.
