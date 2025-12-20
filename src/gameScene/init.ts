@@ -48,6 +48,7 @@ import Rectangle from "@/core/Rectangle";
 import RGBAColor from "@/core/RGBAColor";
 import Vector from "@/core/Vector";
 import SoundMgr from "@/game/CTRSoundMgr";
+import { getSavedCandyIndex } from "@/ui/InterfaceManager/skinSelection";
 import MathHelper from "@/utils/MathHelper";
 import KeyFrame from "@/visual/KeyFrame";
 import Timeline from "@/visual/Timeline";
@@ -399,9 +400,70 @@ abstract class GameSceneInit extends BaseElement {
     getCandyResourceId(): number {
         const boxType = edition.boxTypes?.[LevelState.pack];
         const isHolidayBox = boxType === BoxType.HOLIDAY;
+
+        // Use Paddington skin for holiday boxes in January
+        if (IS_JANUARY && isHolidayBox) {
+            return ResourceId.IMG_OBJ_CANDY_PADDINGTON;
+        }
+
+        // Get selected candy skin from localStorage (0-50, where 0 is candy_01)
+        const selectedSkin = getSavedCandyIndex();
+
+        // Map candy index to resource ID
+        // candy_01 = IMG_OBJ_CANDY_01_NEW (207)
+        // candy_02 = IMG_OBJ_CANDY_02 (209), candy_03 = IMG_OBJ_CANDY_03 (210), etc.
+        if (selectedSkin === 0) {
+            return ResourceId.IMG_OBJ_CANDY_01_NEW;
+        } else {
+            // ResourceId.IMG_OBJ_CANDY_02 starts at 209, which is selectedSkin 1
+            // So: ResourceId.IMG_OBJ_CANDY_02 + (selectedSkin - 1)
+            return ResourceId.IMG_OBJ_CANDY_02 + (selectedSkin - 1);
+        }
+    }
+
+    getCandyFxResourceId(): number {
+        const boxType = edition.boxTypes?.[LevelState.pack];
+        const isHolidayBox = boxType === BoxType.HOLIDAY;
+        // Paddington uses combined asset, regular candy uses separate FX asset
         return IS_JANUARY && isHolidayBox
             ? ResourceId.IMG_OBJ_CANDY_PADDINGTON
-            : ResourceId.IMG_OBJ_CANDY_01;
+            : ResourceId.IMG_OBJ_CANDY_FX;
+    }
+
+    getCandyConstants() {
+        const boxType = edition.boxTypes?.[LevelState.pack];
+        const isHolidayBox = boxType === BoxType.HOLIDAY;
+        const isPaddington = IS_JANUARY && isHolidayBox;
+
+        if (isPaddington) {
+            // Paddington uses combined constants
+            return {
+                candy_bottom: GameSceneConstants.IMG_OBJ_CANDY_01_candy_bottom,
+                candy_main: GameSceneConstants.IMG_OBJ_CANDY_01_candy_main,
+                candy_top: GameSceneConstants.IMG_OBJ_CANDY_01_candy_top,
+                part_1: GameSceneConstants.IMG_OBJ_CANDY_01_part_1,
+                part_2: GameSceneConstants.IMG_OBJ_CANDY_01_part_2,
+                highlight_start: GameSceneConstants.IMG_OBJ_CANDY_01_highlight_start,
+                highlight_end: GameSceneConstants.IMG_OBJ_CANDY_01_highlight_end,
+                glow: GameSceneConstants.IMG_OBJ_CANDY_01_glow,
+                part_fx_start: GameSceneConstants.IMG_OBJ_CANDY_01_part_fx_start,
+                part_fx_end: GameSceneConstants.IMG_OBJ_CANDY_01_part_fx_end,
+            };
+        } else {
+            // Regular candy uses separate constants
+            return {
+                candy_bottom: GameSceneConstants.IMG_OBJ_CANDY_01_NEW_candy_bottom,
+                candy_main: GameSceneConstants.IMG_OBJ_CANDY_01_NEW_candy_main,
+                candy_top: GameSceneConstants.IMG_OBJ_CANDY_01_NEW_candy_top,
+                part_1: GameSceneConstants.IMG_OBJ_CANDY_01_NEW_part_1,
+                part_2: GameSceneConstants.IMG_OBJ_CANDY_01_NEW_part_2,
+                highlight_start: GameSceneConstants.IMG_OBJ_CANDY_FX_highlight_start,
+                highlight_end: GameSceneConstants.IMG_OBJ_CANDY_FX_highlight_end,
+                glow: GameSceneConstants.IMG_OBJ_CANDY_FX_glow,
+                part_fx_start: GameSceneConstants.IMG_OBJ_CANDY_FX_part_fx_start,
+                part_fx_end: GameSceneConstants.IMG_OBJ_CANDY_FX_part_fx_end,
+            };
+        }
     }
     pointOutOfScreen(p: ConstrainedPoint): boolean {
         const bottomY = this.mapHeight + resolution.OUT_OF_SCREEN_ADJUSTMENT_BOTTOM;
